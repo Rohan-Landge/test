@@ -1,16 +1,10 @@
 from flask import Flask, request, jsonify
 import google.generativeai as genai
 
-app = Flask(_name_)
+app = Flask(__name__)  # ✅ Fixed the __name__ issue
 
-# Configure Gemini API
-GENAI_API_KEY = "curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY" \
--H 'Content-Type: application/json' \
--X POST \
--d '{
-  "contents": [{
-    "parts":[{"text": "Explain how AI works"}]
-    }] # type: ignore  }'"
+# ✅ Correctly Assign the API Key
+GENAI_API_KEY = "AIzaSyAnMEX2nSILcMLIbUG1LjKSrfsUFYcXDNQ"  # Replace with your actual API key
 
 genai.configure(api_key=GENAI_API_KEY)
 
@@ -25,12 +19,18 @@ def webhook():
     try:
         model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(query)
-        answer = response.text if response.text else "I couldn't find an answer."
+
+        # ✅ Handle response correctly
+        if response and response.candidates:
+            answer = response.candidates[0].content.parts[0].text
+        else:
+            answer = "I couldn't find an answer."
 
         return jsonify({"fulfillmentText": answer})
 
     except Exception as e:
-        return jsonify({"fulfillmentText": "Sorry, an error occurred while fetching the response."})
+        return jsonify({"fulfillmentText": f"Sorry, an error occurred: {str(e)}"})
 
-if _name_ == '_main_':
-    app.run(host='0.0.0.0', port=8080)
+# ✅ Fixed __name__ issue
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
