@@ -17,7 +17,7 @@ def webhook():
         return jsonify({"fulfillmentText": "I didn't understand the question."})
 
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-pro')
         response = model.generate_content(query)
 
         # ✅ Handle response correctly
